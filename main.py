@@ -16,6 +16,7 @@ Form, _ = uic.loadUiType("generator.ui")
 class WriteThread(QThread):
     pass
 
+
 def random_not_null(a: int, b: int):
     while True:
         value = random.randint(a, b)
@@ -32,6 +33,7 @@ def generate_a_b(min: int, max: int):
     if a > b:
         a, b = b, a
     return a, b
+
 
 class TaskGenerator(QtWidgets.QMainWindow, Form):
     def __init__(self):
@@ -74,11 +76,12 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
 
                 # Вычисляем интеграл с неверными a и b
                 wrong_integral = latex(integral_simplified.subs({a: wrong_a, b: wrong_b}).simplify(rational=True))
-                wrong_answers.add(f"$${wrong_integral.replace("{","\{").replace("}","\}")}$$")
+                wrong_answers.add(f"$${wrong_integral.replace("{", "\{").replace("}", "\}")}$$")
             # Сохраняем задачу и ответ
-            tasks.add((f"Вычислите $${latex(Integral(f.subs({a: a_value, b: b_value}), x)).replace("{","\{").replace("}","\}")}$$",
-                       f"$${latex(integral_simplified.subs({a: a_value, b: b_value}).simplify(rational=True)).replace("{","\{").replace("}","\}")}$$",
-                       tuple(wrong_answers)))
+            tasks.add((
+                      f"Вычислите $${latex(Integral(f.subs({a: a_value, b: b_value}), x)).replace("{", "\{").replace("}", "\}")}$$",
+                      f"$${latex(integral_simplified.subs({a: a_value, b: b_value}).simplify(rational=True)).replace("{", "\{").replace("}", "\}")}$$",
+                      tuple(wrong_answers)))
         return tasks
 
     @staticmethod
@@ -118,10 +121,11 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
 
                 # Вычисляем интеграл с неверными коэффициентами
                 wrong_integral = integrate(wrong_a * x ** 2 + wrong_b * x + wrong_c / x + wrong_d, x)
-                wrong_answers.add(f"$${latex(wrong_integral).replace("{","\{").replace("}","\}")}$$")
+                wrong_answers.add(f"$${latex(wrong_integral).replace("{", "\{").replace("}", "\}")}$$")
 
             # Сохраняем задачу, верный и неверные ответы
-            tasks.add((f"Вычислите $${latex(Integral(f)).replace("{","\{").replace("}","\}")}$$", f"$${latex(integral).replace("{","\{").replace("}","\}")}$$", tuple(wrong_answers)))
+            tasks.add((f"Вычислите $${latex(Integral(f)).replace("{", "\{").replace("}", "\}")}$$",
+                       f"$${latex(integral).replace("{", "\{").replace("}", "\}")}$$", tuple(wrong_answers)))
             print(tasks)
         return tasks
 
@@ -142,6 +146,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         if a > b:
             a, b = b, a
         return a, b
+
     @staticmethod
     def generate_task_parts(amount_of_tasks=1, f_x_num=0):
         x, k, P_x, f_x = symbols('x k Pn(x) f(x)')
@@ -178,7 +183,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             du = diff(u, x)
             v = integrate(dv, x)
 
-            mid_answer_text = f'$${latex(u * v - Integral(v * du)).replace("{","\{").replace("}","\}")}$$'
+            mid_answer_text = f'$${latex(u * v - Integral(v * du)).replace("{", "\{").replace("}", "\}")}$$'
             mid_answer = u * v - integrate(v * du, x)
             answer = mid_answer.subs(x, b_value) - mid_answer.subs(x, a_value)
 
@@ -189,12 +194,12 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                 mid_wrong.subs(x, b_value) - mid_wrong.subs(x, a_value)
             ]
             false_answers_add = [
-                f'$${latex(u * v - Integral(v * du, (x,a_value,b_value))).replace("{","\{").replace("}","\}")}$$',
-                #f'$${latex(u * dv - Integral(diff(integrate(dv, (x,a_value,b_value)) * diff(u, x)))).replace("{","\{").replace("}","\}")}$$',
-                f'$${latex(u * v - Integral(v * dv)).replace("{","\{").replace("}","\}")}$$'
+                f'$${latex(u * v - Integral(v * du, (x, a_value, b_value))).replace("{", "\{").replace("}", "\}")}$$',
+                # f'$${latex(u * dv - Integral(diff(integrate(dv, (x,a_value,b_value)) * diff(u, x)))).replace("{","\{").replace("}","\}")}$$',
+                f'$${latex(u * v - Integral(v * dv)).replace("{", "\{").replace("}", "\}")}$$'
             ]
 
-            task = f"Вычислите $${latex(Integral(integral,(x,a_value,b_value))).replace("{","\{").replace("}","\}")}$$"
+            task = f"Вычислите $${latex(Integral(integral, (x, a_value, b_value))).replace("{", "\{").replace("}", "\}")}$$"
             add_question = f'Как выглядит пример после применения формулы интегрирования по частям?'
             answers = [f'{answer} (Основной вопрос)', f'{mid_answer_text} (Дополнительный вопрос)']
             all_wrong_answers = [f'{i} (Основной вопрос)' for i in false_answers_main] + [f'{i} (Дополнительный вопрос)'
@@ -206,26 +211,38 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         return tasks
 
     @staticmethod
-    def write_tasks(tasks):
+    def write_tasks(tasks,number, multi=False):
         file_path = QFileDialog.getExistingDirectory(None, "Выбрать путь для сохранения")
         if file_path:
             with open(file_path + "/Задачи.txt", 'w', encoding='utf-8') as file:
-                for task in tasks:
-                    wrong = ""
-                    for i in task[2]:
-                        wrong += f" ~{i}"
-                        print(task[0])
-                    file.write(
-                        f"::МА2 Задание №1:: {task[0]} {{={task[1]}{wrong}}}")
-                    file.write("\n")
-                    file.write("\n")
+                if not multi:
+                    for task in tasks:
+                        wrong = ""
+                        for i in task[2]:
+                            wrong += f" ~{i}\n"
+                        file.write(
+                            f"::МА2 Задание №1:: {task[0]} \n{{={task[1]}\n{wrong}}}")
+                        file.write("\n")
+                        file.write("\n")
+                else:
+                    for task in tasks:
+                        right = ""
+                        wrong = ""
+                        for i in task[2]:
+                            right += f" =%50.0%{i}\n"
+                        for i in task[3]:
+                            wrong += f" ~%-25.0%{i}\n"
+                        file.write(
+                            f"::МА2 Задание №{number}:: {task[0]} {{{right}{wrong}}}")
+                        file.write("\n")
+                        file.write("\n")
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
     application = QtWidgets.QApplication(sys.argv)
     program = TaskGenerator()
-    program.write_tasks(program.direct_integration_2(1))
+    program.write_tasks(program.direct_integration_2(1,3,))
     program.generate_task_parts(1)
     program.direct_integration_2(1)
     program.show()
