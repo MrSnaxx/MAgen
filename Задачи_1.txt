@@ -1,0 +1,10 @@
+::МА2 Задание №1:: Неопределенный интеграл \int \frac\{\left(8 - 4 x\right)^\{2\}\}\{x^\{1.5\}\}\, dx равен: {=\frac{32 \left(x^{2} - 12 x - 12\right)}{3 \sqrt{x}} ~\frac\{2 \cdot \left(27 x^\{2\} - 126 x - 49\right)\}\{\sqrt\{x\}\} ~\frac\{2 \cdot \left(12 x^\{2\} - 12 x - 1\right)\}\{\sqrt\{x\}\} ~\frac\{2 \left(x^\{2\} - 12 x - 12\right)\}\{3 \sqrt\{x\}\}}
+
+::МА2 Задание №1:: Неопределенный интеграл \int \frac\{\left(7 - 2 x\right)^\{2\}\}\{x^\{1.5\}\}\, dx равен: {=\frac{2 \cdot \left(4 x^{2} - 84 x - 147\right)}{3 \sqrt{x}} ~\frac\{2 \cdot \left(25 x^\{2\} - 240 x - 192\right)\}\{3 \sqrt\{x\}\} ~\frac\{8 \cdot \left(25 x^\{2\} - 120 x - 48\right)\}\{3 \sqrt\{x\}\} ~\frac\{2 \left(x^\{2\} - 60 x - 300\right)\}\{3 \sqrt\{x\}\}}
+
+::МА2 Задание №1:: Неопределенный интеграл \int \frac\{\left(4 - 2 x\right)^\{2\}\}\{x^\{1.5\}\}\, dx равен: {=\frac{8 \left(x^{2} - 12 x - 12\right)}{3 \sqrt{x}} ~\frac\{8 \cdot \left(16 x^\{2\} - 24 x - 3\right)\}\{3 \sqrt\{x\}\} ~\frac\{2 \cdot \left(49 x^\{2\} - 42 x - 3\right)\}\{3 \sqrt\{x\}\} ~\frac\{2 \cdot \left(25 x^\{2\} - 120 x - 48\right)\}\{3 \sqrt\{x\}\}}
+
+::МА2 Задание №1:: Неопределенный интеграл \int \frac\{\left(4 - 2 x\right)^\{2\}\}\{x^\{1.5\}\}\, dx равен: {=\frac{8 \left(x^{2} - 12 x - 12\right)}{3 \sqrt{x}} ~\frac\{50 \cdot \left(4 x^\{2\} - 12 x - 3\right)\}\{3 \sqrt\{x\}\} ~\frac\{8 \left(x^\{2\} - 24 x - 48\right)\}\{3 \sqrt\{x\}\} ~\frac\{2 \cdot \left(64 x^\{2\} - 432 x - 243\right)\}\{3 \sqrt\{x\}\}}
+
+::МА2 Задание №1:: Неопределенный интеграл \int \frac\{\left(3 - 3 x\right)^\{2\}\}\{x^\{1.5\}\}\, dx равен: {=\frac{6 \left(x^{2} - 6 x - 3\right)}{\sqrt{x}} ~\frac\{8 \cdot \left(3 x^\{2\} - 12 x - 4\right)\}\{\sqrt\{x\}\} ~\frac\{2 \cdot \left(16 x^\{2\} - 72 x - 27\right)\}\{3 \sqrt\{x\}\} ~\frac\{6 \cdot \left(4 x^\{2\} - 12 x - 3\right)\}\{\sqrt\{x\}\}}
+
