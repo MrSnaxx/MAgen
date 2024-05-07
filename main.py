@@ -231,7 +231,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                         for i in task[2]:
                             right += f" =%50.0%{i}\n"
                         for i in task[3]:
-                            wrong += f" ~%-25.0%{i}\n"
+                            wrong += f" ~%-50.0%{i}\n"
                         file.write(
                             f"::МА2 Задание №{number}:: {task[0]} {{{right}{wrong}}}")
                         file.write("\n")
