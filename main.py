@@ -158,9 +158,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         f_x_value = functions[f_x_num]
         f = k * P_x * f_x_value
         tasks = set()
-        for _ in range(number_of_tasks):
-
-            # Генерация многочлена P(x) степени не выше 2
+        while len(tasks)<number_of_tasks:
             coefs = [0, 0, 0]
             while 0 in coefs:
                 coefs = [random.randint(-4, 4) for _ in range(3)]
@@ -394,7 +392,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                         for i in task[2]:
                             wrong += f" ~{i}\n"
                         file.write(
-                            f"::МА2 Задание №1:: {task[0]} \n{{={task[1]}\n{wrong}}}")
+                            f"::МА2 Задание №{number}:: {task[0]} \n{{={task[1]}\n{wrong}}}")
                         file.write("\n")
                         file.write("\n")
                 else:
