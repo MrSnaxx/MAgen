@@ -152,7 +152,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         return a, b
 
     @staticmethod
-    def generate_task_parts(number_of_tasks=1, f_x_num=0):
+    def task_type_3(number_of_tasks=1, f_x_num=0):
         x, k, P_x, f_x = symbols('x k Pn(x) f(x)')
         functions = [exp(x), log(x), sin(x), cos(x), atan(x)]
         f_x_value = functions[f_x_num]
@@ -206,7 +206,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             task = f"Вычислите $${latex(Integral(integral, (x, a_value, b_value))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"
             add_question = f"Как выглядит пример после применения формулы интегрирования по частям?"
             answers = [f"{answer} (Основной вопрос)", f"{mid_answer_text} (Дополнительный вопрос)"]
-            all_wrong_answers = [f"{i} (Основной вопрос)' for i in false_answers_main] + [f'{i} (Дополнительный вопрос)"
+            all_wrong_answers = [f"{i} (Основной вопрос)" for i in false_answers_main] + [f"{i} (Дополнительный вопрос)"
                                                                                           for i in false_answers_add]
 
             tasks.add((task, add_question, tuple(answers), tuple(all_wrong_answers)))
@@ -400,11 +400,11 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                         right = ""
                         wrong = ""
                         for i in task[2]:
-                            right += f" =%50.0%{i}\n"
+                            right += f" ~%50.0% {i}\n"
                         for i in task[3]:
-                            wrong += f" ~%-25.0%{i}\n"
+                            wrong += f" ~%-50.0% {i}\n"
                         file.write(
-                            f"::МА2 Задание №{number}:: {task[0]} {{{right}{wrong}}}".replace("log", "ln"))
+                            f"::МА2 Задание №{number}:: {task[0]} \n{{{right}{wrong}}}".replace("log", "ln"))
                         file.write("\n")
                         file.write("\n")
     @staticmethod
@@ -522,16 +522,97 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             tasks.add((task, add_question, tuple(answers), tuple(all_wrong_answers)))
         return tasks
 
+    @staticmethod
+    def volume_of_body(num_tasks):
+        # Задаем переменную
+        x = symbols('x')
+
+        def GenerateBorder():  # функция, которая генерирует одну из границ интервала задачи
+            bord_num = random.randint(-3,
+                                      3)  # (числитель) выбирается рандомно целое число от -3 до 3 т.к по шаблону промежуток задан чтобы было в целых пи
+            bord_denom = random.randint(1,
+                                        3)  # (знаменатель) т.к наши функции синусы и косинусы добавляем деление чтобы получат пи/2 3пи/2 пи/3 табличные значения для синусов и косинусов
+            bord = Rational(bord_num,
+                            bord_denom) * pi  # сокращаем нашу дробь, используя Rational, чтобы она осталась обыкновенной, и домнажаем на пи
+            return bord
+
+        def GetAllTaskParametrs():  # функция, которая возрашает все параметры задачи:
+            # a-левая граница, b-правая граница, alpha -множитель(скаляр) f(x), f(x)-рандомная функция из sin(x), cos(x), (sin(x))^2, (cos(x))^2]
+            a = GenerateBorder()
+            b = GenerateBorder()
+            while a == b:
+                a = GenerateBorder()
+            # Проверяем, если a > b, меняем их местами
+            if a > b:
+                a, b = b, a
+            # Выбор случайной функции f(x)
+            functions = [sin(x), cos(x), sin(x) ** 2, cos(x) ** 2]
+            f_x = random.choice(functions)
+            # Генеррация множителя f(x) alpha
+            alpha = 0
+            while alpha == 0:  # Проверяем, чтобы alpha не было равно нулю
+                alpha = random.randint(-10, 10)
+            # Выражаем y через функцию f(x)
+            y = alpha * f_x
+            return y, a, b
+
+        def GetArrayWrongAnswers(basic_arr,
+                                 additional_arr):  # вспомогательная функция для формирования массива из элементов массива неправильных ответов основного и дополнительного вопроса
+            all_wrong_answers = []
+            for elem in basic_arr:
+                all_wrong_answers.append(f'{elem} (Основной вопрос)')
+            for elem in additional_arr:
+                all_wrong_answers.append(f'{elem} (Дополнительный вопрос)')
+            return (all_wrong_answers)
+
+        tasks = set()
+        while len(tasks) < num_tasks:
+            # Получаем параметры
+            y, a, b = GetAllTaskParametrs()
+            # Создаём текст задания
+            task = f"Дана функция y = $${latex(y).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [$${latex(a).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$, $${latex(b).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$]. Используя определенный интеграл, найдите объем тела, образованного вращением относительно оси OX плоской фигуры"
+            answer = integrate(y ** 2, x)  # это пред ответ -неопределённый интеграл
+            answer = integrate(y ** 2, (x, a, b))  # определённый интеграл
+            answer = abs(answer * pi)  # конечный ответ
+            # создание неверных ответов, их фильтрация и перемешка
+            wrong_answers = [a, b, integrate(y, (x, a, b)),
+                             integrate(y ** 2, (x, a, b))]  # создаём список неправильных ответов
+            if answer in wrong_answers:  # Удаляем правильный ответ из неправильных, если он там есть
+                wrong_answers.remove(answer)
+            for i in range(len(wrong_answers)):
+                wrong_answers[
+                    i] = f"$${latex(wrong_answers[i]).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"
+            random.shuffle(wrong_answers)  # Перемешиваем неправильные ответы
+
+            # Формируем уточняющий дополнительный вопрс на знание формулы, ответ и неправильные ответы для него
+            add_question = f'Выберите верное подинтегральное выражение (Если в вашей формуле интеграл умножается на скаляр, то внесите скаляр под интеграл)'
+            add_answer = (y ** 2) * pi
+            length_formula = sqrt(1 + (diff(y,
+                                            x)) ** 2)  # формула длины кривой в неправильных ответах будет частью других неправильных ответов
+            add_wrong_answers = [y, length_formula, y * length_formula,
+                                 y * length_formula * 2 * pi]  # здесь используется 4 остальных формулы из учебника
+            if add_answer in add_wrong_answers:  # Удаляем правильный ответ из неправильных, если он там есть
+                add_wrong_answers.remove(add_answer)
+            for i in range(len(add_wrong_answers)):
+                add_wrong_answers[
+                    i] = f"$${latex(add_wrong_answers[i]).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"
+            random.shuffle(add_wrong_answers)  # Перемешиваем неправильные ответы
+            answers = [
+                f"$${latex(answer).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ (Основной вопрос)",
+                f"$${latex(add_answer).replace('{', n1).replace('}', n2)}$$ (Дополнительный вопрос)"]
+            all_wrong_answers = GetArrayWrongAnswers(wrong_answers, add_wrong_answers)
+            tasks.add((task, add_question, tuple(answers), tuple(all_wrong_answers)))
+        return tasks
+
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
     application = QtWidgets.QApplication(sys.argv)
     program = TaskGenerator()
-    tasks = program.rational_function_2(3)
-    print(tasks)
-    program.write_tasks(tasks, 1)
-    program.generate_task_parts(1)
+    tasks = program.task_type_3(5,0)
+    program.write_tasks(tasks, 2,multi=True)
+    program.task_type_3(1)
     program.direct_integration_2(1)
-    program.show()
-    application.exec_()
+    # program.show()
+    # application.exec_()
