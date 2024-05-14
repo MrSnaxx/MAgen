@@ -216,7 +216,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
     def rational_function_1(number_of_tasks=1):
         # number_of_tasks1 = min(100, number_of_tasks)
         tasks = set()
-        for _ in range(number_of_tasks):
+        while len(tasks)<number_of_tasks:
             A = random.randint(-10, 10)
             while A == 0:
                 A = random.randint(-10, 10)  # Генерация случайного целого числа A
@@ -348,7 +348,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         f = sqrt(((g - a_ * x ** 2) / b_))
         abc = [[4, 4, 1], [1, 1, 1], [4, 4, 4], [9, 9, 9], [1, 1, 4], [1, 1, 9], [4, 4, 9]]
         tasks = set()
-        for _ in range(amount_of_tasks):
+        while len(tasks)<amount_of_tasks:
             alpha, beta, gamma = random.choice(abc)
 
             # Интервал интегрирования
