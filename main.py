@@ -7,9 +7,9 @@ import sympy
 import PyQt5
 from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QFileDialog
-
-from sympy import symbols, integrate, simplify, latex, Integral
-
+from fractions import Fraction
+from sympy import symbols, integrate, simplify, latex, Integral, Rational
+import numpy as np
 from scipy.integrate import quad
 
 Form, _ = uic.loadUiType("generator.ui")
@@ -287,9 +287,24 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             if not (isinstance(integral, sympy.core.numbers.NaN) or integral == sympy.oo or integral == -sympy.oo):
                 # Генерация неверных ответов
                 wrong_answers = set()
-                while len(wrong_answers) < 3:
-                    wrong_integral = integral + random.randint(-10, 10)  # Генерация неверного ответа
-                    wrong_answers.add(f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
+                # Генерация неверных ответов
+                wrong_answers = set()
+                correct_integral_latex = latex(integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)
+                offset = random.randint(-10, -5)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
+                offset = random.randint(-5, -1)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
+                offset = random.randint(2, 5)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
 
                 # Формирование задачи в формате (задача, правильный ответ, неправильные ответы)
                 tasks.add((f"Вычислите $${latex(Integral(function, (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$",
@@ -304,8 +319,8 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         def generate_problem():
             while True:
                 # Генерация случайных параметров
-                B, D = random.randint(-10, 10), random.randint(-10, 10)
-                p, q = random.randint(-10, 10), random.randint(-10, 10)
+                B, D = random_not_null(-10,10), random_not_null(-10,10)
+                p, q = random_not_null(-10,10), random_not_null(-10,10)
 
                 # Проверка, что многочлен в знаменателе не имеет действительных корней
                 if p ** 2 - 4 * q >= 0:
@@ -315,8 +330,8 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                 if B == 0 or D == 0 or p == 0 or q == 0:
                     continue
 
-                a = random.randint(-5, 5)
-                b = random.randint(-5, 5)
+                a = random_not_null(-5,5)
+                b = random_not_null(-5,5)
 
                 # Проверка на равенство 0
                 if a == 0 or b == 0:
@@ -337,18 +352,32 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                     continue  # Генерируем новую задачу
 
                 # Генерация 5 неправильных ответов
-                wrong_answers = tuple(
-                    set([f"$${latex(integral + random.randint(-10, 10)).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$" for _ in
-                         range(5)]))
+                wrong_answers = set()
+                correct_integral_latex = latex(integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)
+                offset = random.randint(-10, -5)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
+                offset = random.randint(-5, -1)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
+                offset = random.randint(2, 5)
+                # Генерация неверного ответа
+                wrong_integral = integral * offset
+                wrong_answers.add(
+                    f"$${latex(wrong_integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")
 
                 task = (f"Вычислите $${latex(Integral(function, (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$",
                         f"$${latex(integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$",
-                        wrong_answers)
-                return task
+                        tuple(wrong_answers))
+                return tuple(task)
 
-        tasks = []
-        for _ in range(num_tasks):
-            tasks.append(generate_problem())
+        tasks = set()
+        while len(tasks)<num_tasks:
+            tasks.add(generate_problem())
         return tasks
 
     @staticmethod
@@ -358,7 +387,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         abc = [[4, 4, 1], [1, 1, 1], [4, 4, 4], [9, 9, 9], [1, 1, 4], [1, 1, 9], [4, 4, 9]]
         tasks = set()
         while len(tasks)<amount_of_tasks:
-            alpha, beta, gamma = random.choice(abc)
+            alpha, beta, gamma = [random.randint(1,6),random.randint(1,6),random.randint(1,6)]#random.choice(abc)
 
             # Интервал интегрирования
             b = sqrt(((gamma) / alpha))
@@ -371,24 +400,23 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             tmp1 = simplify(f_x * sqrt(1 + f_diff ** 2))
             func = lambdify(x, tmp1, modules=['numpy'])
             integral = quad(func, a, b)[0]
-            answer = 2 * 2 * pi * integral
+            answer = round(2 * 2 * integral,2) * pi
 
-            false_answers_main = [pi * f_diff, pi * integral / 2, pi * integral]
+            false_answers_main = [pi *f_diff,f'{pi * integral / 2:.{2}f}',f'{pi * integral:.{2}f}']
             false_answers_add = [f'от {(a - 1):.{2}f} до {(b + 1):.{2}f}',
                                  f'от {(a - 0.5):.{2}f} до {(b + 0.5):.{2}f}',
                                  f'от {(a - 2 / 3):.{2}f} до {(b + 2 / 3):.{2}f}']
 
-            task = (f"Вычислите площадь поверхности фигуры, полученной путем вращения окружности {alpha} * "
-                    f"$${latex(x ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ + {beta} * "
-                    f"$${latex(y ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ = {gamma} вокруг оси OX")
-            add_question = f"Выберите верный интервал интегрирования"
+            task = (f"Вычислите площадь поверхности фигуры, полученной путем вращения окружности "
+                    f"$${latex(alpha* x ** 2 + beta * y ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)} = {gamma}$$ вокруг оси OX")
+            add_question = f"\nВыберите верный интервал интегрирования"
             answers = [
                 f"$${latex(answer).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ (Основной вопрос)",
                 f"{mid_answer_text} (Дополнительный вопрос)"]
             all_wrong_answers = [f"$${latex(i).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ (Основной вопрос)" for i in
                                  false_answers_main] + [f"{i} (Дополнительный вопрос)" for i in false_answers_add]
             tasks.add((task, add_question, tuple(answers), tuple(all_wrong_answers)))
-            return tasks
+        return tasks
 
     @staticmethod
     def write_tasks(tasks,number, multi=False):
@@ -445,7 +473,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         while len(tasks) < num_tasks:
             f, a, b = generate_func()
             x = Symbol('x')
-            task = f"Дана функция y = $${latex(f).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [{a}, {b}]. Выберите интеграл описывающий длину дуги y = $${latex(f).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на указанном отрезке. Вычислять интеграл не нужно "
+            task = f"Выберите интеграл описывающий длину дуги $$y = {latex(f).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [{a}, {b}]. Вычислять интеграл не нужно "
             proiz = diff(f, x)
             sqr_proiz = proiz * proiz
             answer = f"$${latex(Integral(sqrt(1 + sqr_proiz), (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"  # правильная формула длины дуги
@@ -502,7 +530,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         while len(tasks) < num_tasks:
             x = Symbol('x')
             alpha, beta = generate_alpha_beta()
-            task = f"Вычислите площадь фигуры, ограниченной параболой y = $${latex(alpha * x ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ и прямой y = {beta}x"
+            task = f"Вычислите площадь фигуры, ограниченной параболой $$y = {latex(alpha * x ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ и прямой $$y = {beta} x$$."
             numerator, denominator = fast_answer(alpha, beta)  # Правильный ответ
             correct_answer = f'{Fraction(numerator, denominator)}'  # сохраняем правильный ответ в виде строки
             wrong_answers = generate_wrong_answers(alpha, beta)  # 3 неправильных ответа
@@ -535,7 +563,8 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
     def volume_of_body(num_tasks):
         # Задаем переменную
         x = symbols('x')
-
+        n1=TaskGenerator.n1
+        n2=TaskGenerator.n2
         def GenerateBorder():  # функция, которая генерирует одну из границ интервала задачи
             bord_num = random.randint(-3,
                                       3)  # (числитель) выбирается рандомно целое число от -3 до 3 т.к по шаблону промежуток задан чтобы было в целых пи
@@ -579,7 +608,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             # Получаем параметры
             y, a, b = GetAllTaskParametrs()
             # Создаём текст задания
-            task = f"Дана функция y = $${latex(y).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [$${latex(a).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$, $${latex(b).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$]. Используя определенный интеграл, найдите объем тела, образованного вращением относительно оси OX плоской фигуры"
+            task = f"Дана функция $$y = {latex(y).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [$${latex(a).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$, $${latex(b).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$]. Используя определенный интеграл, найдите объем тела, образованного вращением относительно оси OX плоской фигуры"
             answer = integrate(y ** 2, x)  # это пред ответ -неопределённый интеграл
             answer = integrate(y ** 2, (x, a, b))  # определённый интеграл
             answer = abs(answer * pi)  # конечный ответ
@@ -619,8 +648,8 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
 if __name__ == "__main__":
     application = QtWidgets.QApplication(sys.argv)
     program = TaskGenerator()
-    tasks = program.rational_function_1(5)
-    program.write_tasks(tasks, 8)
+    tasks = program.volume_of_body(5)
+    program.write_tasks(tasks, 14,multi=True)
     program.task_type_3(1)
     program.direct_integration_2(1)
     # program.show()
