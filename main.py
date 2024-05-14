@@ -392,7 +392,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                         for i in task[2]:
                             wrong += f" ~{i}\n"
                         file.write(
-                            f"::МА2 Задание №{number}:: {task[0]} \n{{={task[1]}\n{wrong}}}")
+                            f"::МА2 Задание №{number}:: {task[0]} \n{{={task[1]}\n{wrong}}}".replace("log", "ln"))
                         file.write("\n")
                         file.write("\n")
                 else:
@@ -404,9 +404,124 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                         for i in task[3]:
                             wrong += f" ~%-25.0%{i}\n"
                         file.write(
-                            f"::МА2 Задание №{number}:: {task[0]} {{{right}{wrong}}}")
+                            f"::МА2 Задание №{number}:: {task[0]} {{{right}{wrong}}}".replace("log", "ln"))
                         file.write("\n")
                         file.write("\n")
+    @staticmethod
+    def arc_length(num_tasks):
+        def generate_func():
+            x = Symbol('x')
+            n = np.random.randint(2, 4)  # Случайная степень многочлена от 2 до 3 чтобы было поинтереснее
+            count = np.random.randint(1, 4)  # Случайное количество одночленов от 1 до 3
+
+            coefficients = []
+            for i in range(count):
+                coefficient = np.random.randint(-5, 6)  # Случайный коэффициент от -5 до 5
+                while coefficient == 0:
+                    coefficient = np.random.randint(-5, 6)  # Повторяем, пока не получим ненулевой коэффициент
+                coefficients.append(coefficient)
+
+            f = sum(coefficients[i] * (x ** max(0, n - i)) for i in range(len(coefficients)))
+
+            a = np.random.randint(-10, 11)  # Генерация a
+            b = np.random.randint(-10, 11)  # Генерация b
+            while a == b:  # Проверка на равенство границ
+                b = np.random.randint(-10, 11)
+            if a > b:  # Гарантия того, что a < b
+                a, b = b, a
+
+            return f, a, b
+
+        tasks = set()
+        while len(tasks) < num_tasks:
+            f, a, b = generate_func()
+            x = Symbol('x')
+            task = f"Дана функция y = $${latex(f).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [{a}, {b}]. Выберите интеграл описывающий длину дуги y = $${latex(f).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на указанном отрезке. Вычислять интеграл не нужно "
+            proiz = diff(f, x)
+            sqr_proiz = proiz * proiz
+            answer = f"$${latex(Integral(sqrt(1 + sqr_proiz), (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"  # правильная формула длины дуги
+            wrong_answers = []
+            wrong_answers.append(
+                f"$${latex(pi * Integral(f * f, (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")  # неправильный ответ формула объёма тела вращения
+            wrong_answers.append(
+                f"$${latex(Integral(f, (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")  # неправильный ответ формула площади плоской фигуры
+            wrong_answers.append(
+                f"$${latex(2 * pi * Integral(f * sqrt(1 + sqr_proiz), (x, a, b))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$")  # неправильный ответ формула площади поверхности вращения
+            random.shuffle(wrong_answers)  # Перемешиваем неправильные ответы
+            tasks.add((task, answer, tuple(wrong_answers)))
+        return tasks
+
+    @staticmethod
+    def area_of_plane_figure(num_tasks):
+        def fast_answer(alpha, beta):
+            # Получение ответа быстрым способом не через интеграл
+            pred_answer_1 = beta ** 3  # Предполагаемый числитель, у него меняется знак в зависимости от условия
+            pred_answer_2 = 6 * alpha ** 2  # Знаменатель
+            return abs(pred_answer_1), pred_answer_2
+
+        def generate_alpha_beta():
+            alpha = np.random.randint(-5, 6)
+            while alpha == 0:  # Проверка на ноль
+                alpha = np.random.randint(-5, 6)
+
+            beta = np.random.randint(-5, 6)
+            while beta == 0 or beta == alpha:  # Проверка на ноль и равенство alpha
+                beta = np.random.randint(-5, 6)
+
+            return alpha, beta
+
+        def generate_wrong_answers(alpha, beta):  # создание неверных ответов близких к вычислениям
+            wrong_answers = []
+            numerator, denominator = fast_answer(alpha, beta)
+            wrong_answers.append(f'{Fraction(numerator, abs(alpha * beta))}')
+            numerator, denominator = fast_answer(beta,
+                                                 alpha)  # меняем местами альфу и бету чтобы получить два новых неправильных ответа
+            wrong_answers.append(f'{Fraction(numerator, denominator)}')  #
+            wrong_answers.append(f'{Fraction(abs(alpha * beta), numerator)}')
+            return wrong_answers
+
+        def GetArrayWrongAnswers(basic_arr,
+                                 additional_arr):  # вспомогательная функция для формирования массива из элементов массива неправильных ответов основного и дополнительного вопроса
+            all_wrong_answers = []
+            for elem in basic_arr:
+                all_wrong_answers.append(f'{elem} (Основной вопрос)')
+            for elem in additional_arr:
+                all_wrong_answers.append(f'{elem} (Дополнительный вопрос)')
+            return (all_wrong_answers)
+
+        tasks = set()
+        while len(tasks) < num_tasks:
+            x = Symbol('x')
+            alpha, beta = generate_alpha_beta()
+            task = f"Вычислите площадь фигуры, ограниченной параболой y = $${latex(alpha * x ** 2).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ и прямой y = {beta}x"
+            numerator, denominator = fast_answer(alpha, beta)  # Правильный ответ
+            correct_answer = f'{Fraction(numerator, denominator)}'  # сохраняем правильный ответ в виде строки
+            wrong_answers = generate_wrong_answers(alpha, beta)  # 3 неправильных ответа
+            if correct_answer in wrong_answers:  # Удаляем правильный ответ из неправильных, если он там есть
+                wrong_answers.remove(correct_answer)
+                wrong_answers.append(
+                    f'{Fraction(denominator, numerator)}')  # добавляем перевёрнутую дробь в случае если удалили один ответ
+            random.shuffle(wrong_answers)  # Перемешиваем неправильные ответы
+
+            # Формируем уточняющий дополнительный вопрс на знание формулы, ответ и неправильные ответы для него
+            add_question = f'Найдите пределы интегрирования a(левая граница) и b(правая граница) для решения данной задачи.'
+            border_integral = Fraction(beta, alpha)  # вводим переменную чтобы она не считалась по несколько раз
+            if border_integral < 0:  # меняем местами границы в пошаговом решении в зависимости от условия, а также ставим границы в дополнительном ответе в правильном порядке
+                add_answer = f'{border_integral} и 0'  # ответ на дополнительный вопрос в зависимости от знака
+                add_wrong_answers = [f'0 и {border_integral * (-1)}', f'{2 * border_integral} и 0',
+                                     f'{border_integral} и {border_integral * (-1)}']  # Создаём неправильные ответы
+            else:
+                add_answer = f'0 и {border_integral}'
+                add_wrong_answers = [f'{border_integral * (-1)} и 0', f'0 и {2 * border_integral}',
+                                     f'{border_integral * (-1)} и {border_integral}']  # Создаём неправильные ответы
+            if add_answer in add_wrong_answers:  # Удаляем правильный ответ из неправильных, если он там есть
+                add_wrong_answers.remove(add_answer)
+            random.shuffle(add_wrong_answers)  # Перемешиваем неправильные ответы
+            answers = [f'{correct_answer} (Основной вопрос)', f'{add_answer} (Дополнительный вопрос)']
+            all_wrong_answers = GetArrayWrongAnswers(wrong_answers, add_wrong_answers)
+            tasks.add((task, add_question, tuple(answers), tuple(all_wrong_answers)))
+        return tasks
+
 
 
 # Press the green button in the gutter to run the script.
