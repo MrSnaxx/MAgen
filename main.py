@@ -608,7 +608,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             # Получаем параметры
             y, a, b = GetAllTaskParametrs()
             # Создаём текст задания
-            task = f"Дана функция $$y = {latex(y).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке [$${latex(a).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$, $${latex(b).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$]. Используя определенный интеграл, найдите объем тела, образованного вращением относительно оси OX плоской фигуры"
+            task = f"Дана функция $$y = {latex(y).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$ на отрезке $$[{latex(a).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}, {latex(b).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}]$$. Используя определенный интеграл, найдите объем тела, образованного вращением относительно оси OX плоской фигуры"
             answer = integrate(y ** 2, x)  # это пред ответ -неопределённый интеграл
             answer = integrate(y ** 2, (x, a, b))  # определённый интеграл
             answer = abs(answer * pi)  # конечный ответ
