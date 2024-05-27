@@ -38,11 +38,59 @@ def generate_a_b(min: int, max: int):
 
 
 class TaskGenerator(QtWidgets.QMainWindow, Form):
+
     n1, n2 = "\{", "\}"
 
     def __init__(self):
         super(TaskGenerator, self).__init__()
         self.setupUi(self)
+        self.pushButton.clicked.connect(self.kekw)
+
+    def kekw(self):
+        match self.comboBox.currentIndex():
+            case 0:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 1:
+                tasks = self.direct_integration_2(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 2:
+                tasks = self.parts_integration(self.spinBox.value(),0)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 3:
+                tasks = self.parts_integration(self.spinBox.value(),1)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 4:
+                tasks = self.parts_integration(self.spinBox.value(),2)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 5:
+                tasks = self.parts_integration(self.spinBox.value(),3)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 6:
+                tasks = self.parts_integration(self.spinBox.value(),4)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 7:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 8:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 9:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 10:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 11:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 12:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+            case 13:
+                tasks = self.direct_integration_1(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+
 
     @staticmethod
     def direct_integration_1(number_of_tasks):
@@ -130,7 +178,6 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             # Сохраняем задачу, верный и неверные ответы
             tasks.add((f"Вычислите $${latex(Integral(f)).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$",
                        f"$${latex(integral).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$", tuple(wrong_answers)))
-            print(tasks)
         return tasks
 
     @staticmethod
@@ -152,7 +199,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         return a, b
 
     @staticmethod
-    def task_type_3(number_of_tasks=1, f_x_num=0):
+    def parts_integration(number_of_tasks=1, f_x_num=0):
         x, k, P_x, f_x = symbols('x k Pn(x) f(x)')
         functions = [exp(x), log(x), sin(x), cos(x), atan(x)]
         f_x_value = functions[f_x_num]
@@ -381,7 +428,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
         return tasks
 
     @staticmethod
-    def generate_task_square(amount_of_tasks=1):
+    def geom_integration(amount_of_tasks=1):
         x, y, a_, b_, g = symbols('x y a b g')
         f = sqrt(((g - a_ * x ** 2) / b_))
         abc = [[4, 4, 1], [1, 1, 1], [4, 4, 4], [9, 9, 9], [1, 1, 4], [1, 1, 9], [4, 4, 9]]
@@ -648,9 +695,5 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
 if __name__ == "__main__":
     application = QtWidgets.QApplication(sys.argv)
     program = TaskGenerator()
-    tasks = program.volume_of_body(5)
-    program.write_tasks(tasks, 14,multi=True)
-    program.task_type_3(1)
-    program.direct_integration_2(1)
-    # program.show()
-    # application.exec_()
+    program.show()
+    application.exec_()
