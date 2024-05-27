@@ -56,40 +56,40 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
                 program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
             case 2:
                 tasks = self.parts_integration(self.spinBox.value(),0)
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 3:
                 tasks = self.parts_integration(self.spinBox.value(),1)
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 4:
                 tasks = self.parts_integration(self.spinBox.value(),2)
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 5:
                 tasks = self.parts_integration(self.spinBox.value(),3)
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 6:
                 tasks = self.parts_integration(self.spinBox.value(),4)
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 7:
-                tasks = self.direct_integration_1(self.spinBox.value())
+                tasks = self.rational_function_1(self.spinBox.value())
                 program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
             case 8:
-                tasks = self.direct_integration_1(self.spinBox.value())
+                tasks = self.rational_function_2(self.spinBox.value())
                 program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
             case 9:
-                tasks = self.direct_integration_1(self.spinBox.value())
+                tasks = self.rational_function_3(self.spinBox.value())
                 program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
             case 10:
-                tasks = self.direct_integration_1(self.spinBox.value())
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                tasks = self.geom_integration(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 11:
-                tasks = self.direct_integration_1(self.spinBox.value())
+                tasks = self.arc_length(self.spinBox.value())
                 program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
             case 12:
-                tasks = self.direct_integration_1(self.spinBox.value())
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                tasks = self.area_of_plane_figure(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
             case 13:
-                tasks = self.direct_integration_1(self.spinBox.value())
-                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=False)
+                tasks = self.volume_of_body(self.spinBox.value())
+                program.write_tasks(tasks, self.comboBox.currentIndex(), multi=True)
 
 
     @staticmethod
