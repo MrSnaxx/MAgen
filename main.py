@@ -250,7 +250,7 @@ class TaskGenerator(QtWidgets.QMainWindow, Form):
             ])
 
             task = f"Вычислите $${latex(Integral(integral, (x, a_value, b_value))).replace('{', TaskGenerator.n1).replace('}', TaskGenerator.n2)}$$"
-            add_question = f"Как выглядит пример после применения формулы интегрирования по частям?"
+            add_question = f"Как выглядит пример после применения формулы интегрирования по частям&#63;"
             answers = [f"{answer} (Основной вопрос)", f"{mid_answer_text} (Дополнительный вопрос)"]
             all_wrong_answers = [f"{i} (Основной вопрос)" for i in false_answers_main] + [f"{i} (Дополнительный вопрос)"
                                                                                           for i in false_answers_add]
